@@ -1,3 +1,5 @@
+x-jwt-secret: &jwt-secret dummy-jwt-secret-for-local-dev-only
+
 services:
   db:
     image: postgres:18.6
@@ -5,6 +7,7 @@ services:
       POSTGRES_DB: postgresting
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
+      JWT_SECRET: *jwt-secret
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -24,8 +27,8 @@ services:
     environment:
       PGRST_DB_URI: postgres://authenticator:mysecretpassword@db:5432/postgresting
       PGRST_DB_SCHEMAS: api
-      PGRST_DB_ANON_ROLE: web_anonymous
-      PGRST_JWT_SECRET: dummy-jwt-secret-for-local-dev-only
+      PGRST_DB_ANON_ROLE: anonymous
+      PGRST_JWT_SECRET: *jwt-secret
       PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3000
     ports:
       - "127.0.0.1:3000:3000"
