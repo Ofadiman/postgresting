@@ -15,5 +15,17 @@ services:
       timeout: 5s
       retries: 30
 
+  api:
+    image: postgrest/postgrest:v16.4
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:mysecretpassword@db:5432/postgresting
+      PGRST_DB_SCHEMAS: api
+      PGRST_DB_ANON_ROLE: web_anon
+    ports:
+      - "127.0.0.1:3000:3000"
+
 volumes:
   pgdata:
