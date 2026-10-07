@@ -37,8 +37,9 @@ services:
     image: swaggerapi/swagger-ui:v5.33.1
     depends_on:
       - api
-    environment:
-      URL: http://localhost:3000/
+    volumes:
+      - ./swagger/index.html:/usr/share/nginx/html/index.html:ro
+      - ./swagger/postgrest-initializer.js:/usr/share/nginx/html/postgrest-initializer.js:ro
     ports:
       - "127.0.0.1:8080:8080"
 
