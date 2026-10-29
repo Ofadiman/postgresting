@@ -41,7 +41,7 @@ services:
     ports:
       - "127.0.0.1:25080:8080"
 
-  app:
+  web:
     build: .
     init: true
     ports:
