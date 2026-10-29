@@ -44,6 +44,8 @@ services:
   web:
     build: .
     init: true
+    environment:
+      API_URL: http://api:3000
     ports:
       - "127.0.0.1:25173:25173"
     develop:
