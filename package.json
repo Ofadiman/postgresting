@@ -5,7 +5,7 @@
   "scripts": {
     "build": "react-router build",
     "start:dev": "react-router dev",
-    "start:prod": "react-router-serve ./build/server/index.js",
+    "start:prod": "vite preview",
     "typescript:check": "react-router typegen && tsc"
   },
   "dependencies": {

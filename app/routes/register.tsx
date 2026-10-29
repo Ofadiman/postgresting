@@ -5,9 +5,8 @@ import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { data, Form, redirect, useNavigation } from "react-router";
+import { Form, redirect, useNavigation } from "react-router";
 
-import { tokenCookie } from "~/cookies.server";
 import type { Route } from "./+types/register";
 
 type ApiError = {
@@ -21,13 +20,12 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Register" }];
 }
 
-export async function action({ request }: Route.ActionArgs) {
+export async function clientAction({ request }: Route.ClientActionArgs) {
   const formData = await request.formData();
   const username = String(formData.get("username") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  const apiUrl = process.env.API_URL ?? "http://127.0.0.1:25000";
-  const response = await fetch(`${apiUrl}/rpc/signup`, {
+  const response = await fetch("http://127.0.0.1:25000/rpc/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -35,9 +33,8 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (response.ok) {
     const { token } = (await response.json()) as { token: string };
-    return redirect("/", {
-      headers: { "Set-Cookie": await tokenCookie.serialize(token) },
-    });
+    localStorage.setItem("token", token);
+    return redirect("/");
   }
 
   if (response.status === 400 || response.status === 409) {
@@ -45,7 +42,7 @@ export async function action({ request }: Route.ActionArgs) {
     const text = hint ?? message;
     const errors: FieldErrors =
       message === "Invalid password" ? { password: text } : { username: text };
-    return data({ username, errors }, { status: response.status });
+    return { username, errors };
   }
 
   throw new Error(`Sign-up request failed with status ${response.status}`);
