@@ -18,21 +18,27 @@ import type { Route } from "./+types/register";
 
 type SignupArgs = Database["api"]["Functions"]["signup"]["Args"];
 
-const signupSchema = z.object({
-  username: z
-    .string()
-    .regex(
-      /^[A-Za-z0-9_]{3,32}$/,
-      "Use 3 to 32 letters, digits, or underscores.",
-    ),
-  password: z
-    .string()
-    .refine((value) => [...value].length >= 8, "Use at least 8 characters.")
-    .refine(
-      (value) => new TextEncoder().encode(value).length <= 72,
-      "Use at most 72 bytes.",
-    ),
-}) satisfies z.ZodType<SignupArgs>;
+const signupSchema = z
+  .object({
+    username: z
+      .string()
+      .regex(
+        /^[A-Za-z0-9_]{3,32}$/,
+        "Use 3 to 32 letters, digits, or underscores.",
+      ),
+    password: z
+      .string()
+      .refine((value) => [...value].length >= 8, "Use at least 8 characters.")
+      .refine(
+        (value) => new TextEncoder().encode(value).length <= 72,
+        "Use at most 72 bytes.",
+      ),
+    passwordConfirmation: z.string(),
+  })
+  .refine((values) => values.password === values.passwordConfirmation, {
+    error: "Passwords don't match.",
+    path: ["passwordConfirmation"],
+  }) satisfies z.ZodType<SignupArgs>;
 
 function toFieldError(error: Error) {
   if (!(error instanceof PostgrestError)) return null;
@@ -50,7 +56,7 @@ export default function Register() {
   const navigate = useNavigate();
   const form = useForm({
     resolver: zodResolver(signupSchema),
-    defaultValues: { username: "", password: "" },
+    defaultValues: { username: "", password: "", passwordConfirmation: "" },
   });
   const signup = useMutation({
     mutationFn: async (args: SignupArgs) => {
@@ -85,7 +91,9 @@ export default function Register() {
             component="form"
             noValidate
             spacing={3}
-            onSubmit={form.handleSubmit((values) => signup.mutate(values))}
+            onSubmit={form.handleSubmit(({ username, password }) =>
+              signup.mutate({ username, password }),
+            )}
           >
             <Typography component="h1" variant="h5">
               Sign up
@@ -100,7 +108,7 @@ export default function Register() {
               helperText={errors.username?.message}
             />
             <TextField
-              {...form.register("password")}
+              {...form.register("password", { deps: ["passwordConfirmation"] })}
               variant="standard"
               label="Password"
               type="password"
@@ -108,6 +116,16 @@ export default function Register() {
               required
               error={Boolean(errors.password)}
               helperText={errors.password?.message}
+            />
+            <TextField
+              {...form.register("passwordConfirmation")}
+              variant="standard"
+              label="Confirm password"
+              type="password"
+              autoComplete="new-password"
+              required
+              error={Boolean(errors.passwordConfirmation)}
+              helperText={errors.passwordConfirmation?.message}
             />
             <Button
               type="submit"
