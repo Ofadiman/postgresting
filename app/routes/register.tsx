@@ -5,44 +5,43 @@ import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Form, redirect, useNavigation } from "react-router";
+import { PostgrestError } from "@supabase/postgrest-js";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 import { api } from "~/api";
+import type { Database } from "~/database.types";
 import type { Route } from "./+types/register";
 
-type FieldErrors = Partial<Record<"username" | "password", string>>;
+type SignupArgs = Database["api"]["Functions"]["signup"]["Args"];
+
+type FieldErrors = Partial<Record<keyof SignupArgs, string>>;
+
+function toFieldErrors(error: Error | null): FieldErrors | null {
+  if (!(error instanceof PostgrestError)) return null;
+  if (error.code !== "PT400" && error.code !== "PT409") return null;
+  const text = error.hint || error.message;
+  return error.message === "Invalid password" ? { password: text } : { username: text };
+}
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Register" }];
 }
 
-export async function clientAction({ request }: Route.ClientActionArgs) {
-  const formData = await request.formData();
-  const username = String(formData.get("username") ?? "");
-  const password = String(formData.get("password") ?? "");
-
-  const { data, error, status } = await api
-    .rpc("signup", { username, password })
-    .single();
-
-  if (!error) {
-    localStorage.setItem("token", data.token);
-    return redirect("/");
-  }
-
-  if (status === 400 || status === 409) {
-    const text = error.hint || error.message;
-    const errors: FieldErrors =
-      error.message === "Invalid password" ? { password: text } : { username: text };
-    return { username, errors };
-  }
-
-  throw error;
-}
-
-export default function Register({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
-  const errors = actionData?.errors;
+export default function Register() {
+  const navigate = useNavigate();
+  const signup = useMutation({
+    mutationFn: async (args: SignupArgs) => {
+      const { data } = await api.rpc("signup", args).single().throwOnError();
+      return data;
+    },
+    onSuccess: ({ token }) => {
+      localStorage.setItem("token", token);
+      navigate("/");
+    },
+    throwOnError: (error) => toFieldErrors(error) === null,
+  });
+  const errors = toFieldErrors(signup.error);
 
   return (
     <Box
@@ -51,7 +50,18 @@ export default function Register({ actionData }: Route.ComponentProps) {
     >
       <Card sx={{ width: "100%", maxWidth: 400 }}>
         <CardContent sx={{ p: 4 }}>
-          <Stack component={Form} method="post" spacing={3}>
+          <Stack
+            component="form"
+            spacing={3}
+            onSubmit={(event) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
+              signup.mutate({
+                username: String(formData.get("username") ?? ""),
+                password: String(formData.get("password") ?? ""),
+              });
+            }}
+          >
             <Typography component="h1" variant="h5">
               Sign up
             </Typography>
@@ -60,7 +70,6 @@ export default function Register({ actionData }: Route.ComponentProps) {
               name="username"
               label="Username"
               autoComplete="username"
-              defaultValue={actionData?.username}
               required
               error={Boolean(errors?.username)}
               helperText={errors?.username}
@@ -75,11 +84,7 @@ export default function Register({ actionData }: Route.ComponentProps) {
               error={Boolean(errors?.password)}
               helperText={errors?.password}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              loading={navigation.state === "submitting"}
-            >
+            <Button type="submit" variant="contained" loading={signup.isPending}>
               Sign up
             </Button>
           </Stack>
