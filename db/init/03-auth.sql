@@ -24,16 +24,16 @@ as $$
   from signing_input;
 $$;
 
-create function auth.issue_token(user_id uuid) returns json
+create function auth.issue_token(user_id uuid) returns text
 language sql stable
 set search_path = ''
 as $$
-  select json_build_object('token', auth.sign_jwt(json_build_object(
+  select auth.sign_jwt(json_build_object(
     'role', 'authenticated',
     'sub', user_id,
     'iat', extract(epoch from now())::integer,
     'exp', extract(epoch from now() + interval '1 hour')::integer
-  )));
+  ));
 $$;
 
 create function auth.require_post() returns void
@@ -49,7 +49,7 @@ begin
 end;
 $$;
 
-create function api.signup(username text, password text) returns json
+create function api.signup(username text, password text) returns table (token text)
 language plpgsql security definer
 set search_path = ''
 as $$
@@ -76,14 +76,14 @@ begin
   returning id into new_user_id;
 
   perform set_config('response.status', '201', true);
-  return auth.issue_token(new_user_id);
+  return query select auth.issue_token(new_user_id);
 exception
   when unique_violation then
     raise sqlstate 'PT409' using message = 'Username is already taken';
 end;
 $$;
 
-create function api.login(username text, password text) returns json
+create function api.login(username text, password text) returns table (token text)
 language plpgsql security definer
 set search_path = ''
 as $$
@@ -101,7 +101,7 @@ begin
     raise sqlstate 'PT401' using message = 'Invalid username or password';
   end if;
 
-  return auth.issue_token(user_id);
+  return query select auth.issue_token(user_id);
 end;
 $$;
 

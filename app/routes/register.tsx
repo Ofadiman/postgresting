@@ -7,12 +7,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Form, redirect, useNavigation } from "react-router";
 
+import { api } from "~/api";
 import type { Route } from "./+types/register";
-
-type ApiError = {
-  message: string;
-  hint: string | null;
-};
 
 type FieldErrors = Partial<Record<"username" | "password", string>>;
 
@@ -25,27 +21,23 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   const username = String(formData.get("username") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  const response = await fetch("http://127.0.0.1:25000/rpc/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
+  const { data, error, status } = await api
+    .rpc("signup", { username, password })
+    .single();
 
-  if (response.ok) {
-    const { token } = (await response.json()) as { token: string };
-    localStorage.setItem("token", token);
+  if (!error) {
+    localStorage.setItem("token", data.token);
     return redirect("/");
   }
 
-  if (response.status === 400 || response.status === 409) {
-    const { message, hint } = (await response.json()) as ApiError;
-    const text = hint ?? message;
+  if (status === 400 || status === 409) {
+    const text = error.hint || error.message;
     const errors: FieldErrors =
-      message === "Invalid password" ? { password: text } : { username: text };
+      error.message === "Invalid password" ? { password: text } : { username: text };
     return { username, errors };
   }
 
-  throw new Error(`Sign-up request failed with status ${response.status}`);
+  throw error;
 }
 
 export default function Register({ actionData }: Route.ComponentProps) {

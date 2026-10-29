@@ -16,6 +16,8 @@ services:
       interval: 2s
       timeout: 5s
       retries: 30
+    ports:
+      - "127.0.0.1:25432:5432"
 
   api:
     image: postgrest/postgrest:v16.4

@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
+    "database:types": "supabase gen types typescript --db-url 'postgres://admin:password@127.0.0.1:25432/postgresting?sslmode=disable' --schema api > app/database.types.ts",
     "start:dev": "react-router dev",
     "start:prod": "vite preview",
     "typescript:check": "react-router typegen && tsc"
@@ -16,6 +17,7 @@
     "@mui/material": "^9.5.0",
     "@react-router/node": "^8.4.0",
     "@react-router/serve": "^8.4.0",
+    "@supabase/postgrest-js": "^2.118.0",
     "isbot": "^5.2.2",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
