@@ -1,4 +1,4 @@
-const specUrl = "http://localhost:3000/";
+const specUrl = "http://127.0.0.1:25000/";
 
 const tagsByPath = {
   "/rpc/signup": "auth",
