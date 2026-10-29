@@ -43,5 +43,35 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
 
+  app:
+    build: .
+    init: true
+    ports:
+      - "127.0.0.1:5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /home/ofadiman/postgresting/app
+        - action: sync
+          path: ./public
+          target: /home/ofadiman/postgresting/public
+        - action: rebuild
+          path: mise.toml
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: pnpm-lock.yaml
+        - action: rebuild
+          path: pnpm-workspace.yaml
+        - action: rebuild
+          path: .npmrc
+        - action: rebuild
+          path: tsconfig.json
+        - action: rebuild
+          path: vite.config.ts
+        - action: rebuild
+          path: react-router.config.ts
+
 volumes:
   pgdata:
