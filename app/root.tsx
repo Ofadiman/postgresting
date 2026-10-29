@@ -7,6 +7,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import CssBaseline from "@mui/material/CssBaseline";
+
 import type { Route } from "./+types/root";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -37,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <CssBaseline />
         {children}
         <ScrollRestoration />
         <Scripts />
