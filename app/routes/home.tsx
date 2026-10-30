@@ -17,9 +17,14 @@ export default function Home() {
         <Typography component="h1" variant="h4">
           Postgresting
         </Typography>
-        <Button component={Link} to="/register" variant="contained">
-          Sign up
-        </Button>
+        <Stack direction="row" spacing={2}>
+          <Button component={Link} to="/register" variant="contained">
+            Sign up
+          </Button>
+          <Button component={Link} to="/sign-in" variant="outlined">
+            Sign in
+          </Button>
+        </Stack>
       </Stack>
     </Container>
   );
