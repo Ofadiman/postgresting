@@ -8,3 +8,4 @@
 
 # Vitest
 /.vitest/
+/coverage/
