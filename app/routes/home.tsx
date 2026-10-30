@@ -2,7 +2,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { href, Link } from "react-router";
+import { href, useNavigate } from "react-router";
 
 import type { Route } from "./+types/home";
 
@@ -11,20 +11,22 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  function signOut() {
+    localStorage.removeItem("token");
+    navigate(href("/sign-in"));
+  }
+
   return (
     <Container component="main" sx={{ py: 8 }}>
       <Stack spacing={2} sx={{ alignItems: "flex-start" }}>
         <Typography component="h1" variant="h4">
           Postgresting
         </Typography>
-        <Stack direction="row" spacing={2}>
-          <Button component={Link} to={href("/register")} variant="contained">
-            Sign up
-          </Button>
-          <Button component={Link} to={href("/sign-in")} variant="outlined">
-            Sign in
-          </Button>
-        </Stack>
+        <Button variant="outlined" onClick={signOut}>
+          Sign out
+        </Button>
       </Stack>
     </Container>
   );

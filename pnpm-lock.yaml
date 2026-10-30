@@ -41,6 +41,9 @@ importers:
       isbot:
         specifier: ^5.2.2
         version: 5.2.2
+      jose:
+        specifier: ^6.2.13
+        version: 6.2.13
       react:
         specifier: ^19.3.0
         version: 19.3.0
