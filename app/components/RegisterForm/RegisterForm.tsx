@@ -3,7 +3,7 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Link as RouterLink } from "react-router";
+import { href, Link as RouterLink } from "react-router";
 
 import { useRegisterForm } from "./RegisterForm.hooks";
 import type { RegisterFormProps } from "./RegisterForm.types";
@@ -51,7 +51,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       </Button>
       <Typography variant="body2" sx={{ textAlign: "center" }}>
         Already have an account?{" "}
-        <Link component={RouterLink} to="/sign-in">
+        <Link component={RouterLink} to={href("/sign-in")}>
           Sign in
         </Link>
       </Typography>

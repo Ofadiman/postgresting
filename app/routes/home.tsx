@@ -2,7 +2,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { Link } from "react-router";
+import { href, Link } from "react-router";
 
 import type { Route } from "./+types/home";
 
@@ -18,10 +18,10 @@ export default function Home() {
           Postgresting
         </Typography>
         <Stack direction="row" spacing={2}>
-          <Button component={Link} to="/register" variant="contained">
+          <Button component={Link} to={href("/register")} variant="contained">
             Sign up
           </Button>
-          <Button component={Link} to="/sign-in" variant="outlined">
+          <Button component={Link} to={href("/sign-in")} variant="outlined">
             Sign in
           </Button>
         </Stack>

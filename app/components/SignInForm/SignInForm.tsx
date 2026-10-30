@@ -4,7 +4,7 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Link as RouterLink } from "react-router";
+import { href, Link as RouterLink } from "react-router";
 
 import { useSignInForm } from "./SignInForm.hooks";
 import type { SignInFormProps } from "./SignInForm.types";
@@ -43,7 +43,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       </Button>
       <Typography variant="body2" sx={{ textAlign: "center" }}>
         Don't have an account?{" "}
-        <Link component={RouterLink} to="/register">
+        <Link component={RouterLink} to={href("/register")}>
           Sign up
         </Link>
       </Typography>

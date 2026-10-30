@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 
 import { SignInForm } from "~/components/SignInForm/SignInForm";
 import type { Route } from "./+types/sign-in";
@@ -20,7 +20,7 @@ export default function SignIn() {
     >
       <Card sx={{ width: "100%", maxWidth: 400 }}>
         <CardContent sx={{ p: 4 }}>
-          <SignInForm onSuccess={() => navigate("/")} />
+          <SignInForm onSuccess={() => navigate(href("/"))} />
         </CardContent>
       </Card>
     </Box>
