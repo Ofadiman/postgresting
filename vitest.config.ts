@@ -14,6 +14,7 @@ export default defineConfig({
     include: ["app/**/*.test.{ts,tsx}"],
     setupFiles: ["app/test/setup.ts"],
     restoreMocks: true,
+    unstubEnvs: true,
     coverage: {
       provider: "istanbul",
       include: ["app/**/*.{ts,tsx}"],

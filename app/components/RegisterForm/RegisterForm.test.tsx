@@ -185,6 +185,20 @@ test("hands unexpected server errors to the error boundary", async () => {
   await expect.element(screen.getByText("Something went wrong")).toBeVisible();
 });
 
+test("hands network failures to the error boundary", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  worker.use(http.post("*/rpc/signup", () => HttpResponse.error()));
+  const { screen, submit } = await renderRegisterForm();
+
+  await submit({
+    username: "alice",
+    password: "correct horse",
+    passwordConfirmation: "correct horse",
+  });
+
+  await expect.element(screen.getByText("Something went wrong")).toBeVisible();
+});
+
 test("disables the submit button while signing up", async () => {
   let respond = () => {};
   const responded = new Promise<void>((resolve) => {
